@@ -1,0 +1,30 @@
+#==============================================================================
+# nfx-resource - CMake Package Configuration
+#==============================================================================
+# This file provides CMake targets for the nfx-resource library.
+#
+# Usage:
+#   find_package(nfx-resource REQUIRED)
+#   target_link_libraries(your_target PRIVATE nfx::resource)
+#
+#   # Use the CMake function to embed resources
+#   nfx_embed_resources(
+#       your_target
+#       "${CMAKE_SOURCE_DIR}/resources"
+#       "${CMAKE_BINARY_DIR}/gen"
+#       "your::namespace"
+#   )
+#
+# Available targets:
+#   nfx::resource         - Header-only interface library
+#
+# Available functions:
+#   nfx_embed_resources() - Embeds binary files as C++ resources
+#==============================================================================
+
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/nfx-resource-targets.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/nfxResourcegenFunctions.cmake")
+
+check_required_components(nfx-resource)
