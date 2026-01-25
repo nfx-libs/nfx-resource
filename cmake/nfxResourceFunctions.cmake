@@ -6,7 +6,7 @@ function(nfx_embed_resources)
     cmake_parse_arguments(
         PARSE_ARGV 0
         ARG
-        ""
+        "RECURSE"
         "TARGET;RESOURCE_DIR;OUTPUT_DIR;NAMESPACE;REGISTRY_NAME"
         "PATTERN"
     )
@@ -36,10 +36,20 @@ function(nfx_embed_resources)
 
     set(GLOB_PATTERNS "")
     foreach(PATTERN ${FILE_PATTERN})
-        list(APPEND GLOB_PATTERNS "${ARG_RESOURCE_DIR}/${PATTERN}")
+        if(ARG_RECURSE)
+            # For recursive search, use ** to match subdirectories
+            list(APPEND GLOB_PATTERNS "${ARG_RESOURCE_DIR}/**/${PATTERN}")
+        else()
+            list(APPEND GLOB_PATTERNS "${ARG_RESOURCE_DIR}/${PATTERN}")
+        endif()
     endforeach()
 
-    file(GLOB RESOURCE_FILES CONFIGURE_DEPENDS ${GLOB_PATTERNS})
+    # Use GLOB_RECURSE if RECURSE option is set
+    if(ARG_RECURSE)
+        file(GLOB_RECURSE RESOURCE_FILES CONFIGURE_DEPENDS ${GLOB_PATTERNS})
+    else()
+        file(GLOB RESOURCE_FILES CONFIGURE_DEPENDS ${GLOB_PATTERNS})
+    endif()
 
     if(NOT RESOURCE_FILES)
         message(WARNING "No resources found in ${ARG_RESOURCE_DIR} matching: ${FILE_PATTERN}")
@@ -52,13 +62,23 @@ function(nfx_embed_resources)
     set(ALL_IDS "")
 
     foreach(RESOURCE_FILE ${RESOURCE_FILES})
-        get_filename_component(RESOURCE_NAME "${RESOURCE_FILE}" NAME)
-        string(MAKE_C_IDENTIFIER "${RESOURCE_NAME}" RESOURCE_ID)
+        # Get resource name (relative path for RECURSE, just filename otherwise)
+        if(ARG_RECURSE)
+            file(RELATIVE_PATH RESOURCE_NAME "${ARG_RESOURCE_DIR}" "${RESOURCE_FILE}")
+            # Convert path separators to underscores for unique identifier
+            string(REPLACE "/" "_" RESOURCE_ID_BASE "${RESOURCE_NAME}")
+            string(MAKE_C_IDENTIFIER "${RESOURCE_ID_BASE}" RESOURCE_ID)
+        else()
+            get_filename_component(RESOURCE_NAME "${RESOURCE_FILE}" NAME)
+            string(MAKE_C_IDENTIFIER "${RESOURCE_NAME}" RESOURCE_ID)
+        endif()
+
         set(OUTPUT_CPP "${ARG_OUTPUT_DIR}/resource_${RESOURCE_ID}.cpp")
 
+        # Pass the resource name explicitly to maintain path information
         add_custom_command(
             OUTPUT "${OUTPUT_CPP}"
-            COMMAND $<TARGET_FILE:nfx-resourcegenerator-cli> "${RESOURCE_FILE}" "${OUTPUT_CPP}" "${ARG_NAMESPACE}"
+            COMMAND $<TARGET_FILE:nfx-resourcegenerator-cli> "${RESOURCE_FILE}" "${OUTPUT_CPP}" "${ARG_NAMESPACE}" "${RESOURCE_NAME}"
             DEPENDS "${RESOURCE_FILE}" nfx-resourcegenerator-cli
             COMMENT "Embedding: ${RESOURCE_NAME}"
             VERBATIM

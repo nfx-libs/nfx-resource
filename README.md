@@ -320,6 +320,7 @@ nfx_embed_resources(
     NAMESPACE <namespace>
     REGISTRY_NAME <registry_name>
     [PATTERN pattern1 pattern2 ...]
+    [RECURSE]
 )
 ```
 
@@ -330,6 +331,7 @@ nfx_embed_resources(
 - `NAMESPACE` - C++ namespace (supports nested namespaces like `my::app::resources`)
 - `REGISTRY_NAME` - Name for generated files (creates `<name>.h` and `<name>.cpp`)
 - `PATTERN` - Optional file glob patterns (default: `*` for all files)
+- `RECURSE` - Optional flag to enable recursive subdirectory scanning
 
 **Generated Functions:**
 
@@ -359,11 +361,36 @@ nfx_embed_resources(
 ```
 
 This will:
-1. Scan `${CMAKE_SOURCE_DIR}/assets` for files matching the patterns
+1. Scan `${CMAKE_SOURCE_DIR}/assets` for files matching the patterns (current directory only)
 2. Generate `assets.h` and `assets.cpp` in `${CMAKE_BINARY_DIR}/generated`
 3. Create `myapp::assets::all()` and `myapp::assets::find()` functions
 4. Add generated files to the `myapp` target
 5. Include directory automatically added so you can `#include <assets.h>`
+
+**Example with Recursive Scanning:**
+
+```cmake
+nfx_embed_resources(
+    TARGET myapp
+    RESOURCE_DIR "${CMAKE_SOURCE_DIR}/assets"
+    OUTPUT_DIR "${CMAKE_BINARY_DIR}/generated"
+    NAMESPACE "myapp::assets"
+    REGISTRY_NAME "assets"
+    PATTERN "*.json" "*.xml" "*.png"
+    RECURSE  # Scan subdirectories recursively
+)
+```
+
+With `RECURSE`, resources in subdirectories are named with their relative paths:
+- `assets/config.json` → resource name: `"config.json"`
+- `assets/shaders/vertex.glsl` → resource name: `"shaders/vertex.glsl"`
+- `assets/textures/ui/icon.png` → resource name: `"textures/ui/icon.png"`
+
+```cpp
+// Find resources by their relative paths
+auto* shader = myapp::assets::find("shaders/vertex.glsl");
+auto* icon = myapp::assets::find("textures/ui/icon.png");
+```
 
 ## Project Structure
 
@@ -466,6 +493,7 @@ nfx_embed_resources(
     NAMESPACE "myapp::shaders"
     REGISTRY_NAME "shaders"
     PATTERN "*.glsl" "*.hlsl"
+    RECURSE  # Include shaders from subdirectories
 )
 ```
 
@@ -473,6 +501,9 @@ Then include the appropriate headers:
 ```cpp
 #include <config.h>   // Includes nfx::Resource, provides myapp::config::find()
 #include <shaders.h>  // Includes nfx::Resource, provides myapp::shaders::find()
+
+// Access shader with subdirectory path
+auto* vertShader = myapp::shaders::find("pbr/vertex.glsl");
 ```
 
 ### Custom Resource Registry
@@ -515,4 +546,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-_Updated on January 22, 2026_
+_Updated on January 25, 2026_

@@ -248,26 +248,28 @@ bool generateCppFile(
  *
  * @details This tool converts binary files into C++ source files containing
  *          byte arrays. The generated code is placed in a specified namespace.
- *          The identifier and filename are automatically derived from the input path.
+ *          The identifier is automatically derived from the input path, but
+ *          the resource name can be explicitly specified.
  *
- * @param argc Argument count (must be 4)
+ * @param argc Argument count (must be 4 or 5)
  * @param argv Command-line arguments:
- *             [1] input_file  - Path to the binary file to embed
- *             [2] output_cpp  - Path for the generated .cpp file
- *             [3] namespace   - C++ namespace for the generated code
+ *             [1] input_file   - Path to the binary file to embed
+ *             [2] output_cpp   - Path for the generated .cpp file
+ *             [3] namespace    - C++ namespace for the generated code
+ *             [4] resource_name (optional) - Name for the resource (defaults to filename)
  *
  * @return 0 on success, 1 on error
  *
  * Generated code structure:
  * - {identifier}_data: const uint8_t array containing the binary data
  * - {identifier}_size: const size_t containing the data size
- * - {identifier}_name: const char array containing the filename
+ * - {identifier}_name: const char array containing the resource name
  */
 int main( int argc, char* argv[] )
 {
-    if( argc != 4 )
+    if( argc != 4 && argc != 5 )
     {
-        std::cerr << "Usage: " << argv[0] << " <input_file> <output_cpp> <namespace>\n";
+        std::cerr << "Usage: " << argv[0] << " <input_file> <output_cpp> <namespace> [resource_name]\n";
         return 1;
     }
 
@@ -294,12 +296,13 @@ int main( int argc, char* argv[] )
         return 1;
     }
 
-    const std::string filename = inPath.filename().string();
-    const std::string identifier = makeIdentifier( filename );
+    // Use provided resource name or default to filename
+    const std::string resourceName = ( argc == 5 ) ? argv[4] : inPath.filename().string();
+    const std::string identifier = makeIdentifier( resourceName );
 
     if( !isValidIdentifier( identifier ) )
     {
-        std::cerr << "Error: Could not generate valid C++ identifier from filename: " << filename << "\n";
+        std::cerr << "Error: Could not generate valid C++ identifier from resource name: " << resourceName << "\n";
         return 1;
     }
 
@@ -309,7 +312,7 @@ int main( int argc, char* argv[] )
         return 1;
     }
 
-    if( !generateCppFile( outPath, identifier, filename, ns, data ) )
+    if( !generateCppFile( outPath, identifier, resourceName, ns, data ) )
     {
         return 1;
     }

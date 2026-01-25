@@ -4,11 +4,14 @@
 
 ### Added
 
-- NIL
+- `RECURSE` option for `nfx_embed_resources()` to enable recursive subdirectory scanning
+- Automatic relative path preservation for resources in subdirectories when `RECURSE` is enabled
+- Optional 4th parameter for resource generator CLI to specify custom resource names
 
 ### Changed
 
-- NIL
+- Resource naming: with `RECURSE`, resources now use relative paths (e.g., `"shaders/vertex.glsl"`) instead of just filenames
+- Pattern handling: `RECURSE` mode uses `**` glob patterns to properly match files in subdirectories
 
 ### Deprecated
 
