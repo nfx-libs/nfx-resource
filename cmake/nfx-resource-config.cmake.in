@@ -25,6 +25,6 @@
 @PACKAGE_INIT@
 
 include("${CMAKE_CURRENT_LIST_DIR}/nfx-resource-targets.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/nfxResourcegenFunctions.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/nfxResourceFunctions.cmake")
 
 check_required_components(nfx-resource)
