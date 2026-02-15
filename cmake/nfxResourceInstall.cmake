@@ -15,8 +15,14 @@ install(TARGETS nfx-resourcegenerator-cli
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-# Install CMake functions
-install(FILES cmake/nfxResourceFunctions.cmake
+# Configure and install CMake functions (with proper CLI path for installed packages)
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/nfxResourceFunctions.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/nfxResourceFunctions.cmake
+    @ONLY
+)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/nfxResourceFunctions.cmake
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/nfx-resource
 )
 
