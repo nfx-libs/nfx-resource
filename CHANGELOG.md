@@ -26,6 +26,14 @@
 
 - NIL
 
+## [1.2.0] - 2026-02-15
+
+### Fixed
+
+- CMake functions filename in package config (`nfxResourcegenFunctions.cmake` → `nfxResourceFunctions.cmake`)
+- Resource generator CLI path resolution in installed packages via `find_package()`
+- Separate CMake functions template for build vs installed configurations
+
 ## [1.1.0] - 2026-01-27
 
 ### Added
