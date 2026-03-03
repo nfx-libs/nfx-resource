@@ -26,6 +26,13 @@
 
 - NIL
 
+## [1.3.0] - 2026-03-03
+
+### Fixed
+
+- Guard against multiple inclusions of `nfxResourceInstall.cmake` using `NFX_RESOURCE_INSTALL_INCLUDED` cache variable
+- Guard `nfx-resourcegenerator-cli` and `nfx-resource` target definitions with `if(NOT TARGET ...)` to prevent errors when included multiple times (e.g. via `FetchContent` or `add_subdirectory`)
+
 ## [1.2.0] - 2026-02-15
 
 ### Fixed

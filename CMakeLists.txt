@@ -9,7 +9,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(nfx-resource
-    VERSION 1.2.0
+    VERSION 1.3.0
     DESCRIPTION "C++ Resource Embedding - Header-only interface library + code generation tool"
     HOMEPAGE_URL "https://github.com/nfx-libs/nfx-resource"
     LANGUAGES CXX
