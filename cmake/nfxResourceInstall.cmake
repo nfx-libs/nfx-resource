@@ -2,6 +2,11 @@
 # nfx-resource - Library installation
 #==============================================================================
 
+if(NFX_RESOURCE_INSTALL_INCLUDED)
+    return()
+endif()
+set(NFX_RESOURCE_INSTALL_INCLUDED TRUE CACHE INTERNAL "")
+
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
